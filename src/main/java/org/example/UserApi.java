@@ -51,7 +51,7 @@ public class UserApi {
                 .body(user)
                 .when()
                 .post(LOGIN_USER_URI);
-        accessToken = handleCreate.then()
+        accessToken = handleLogin.then()
                 .extract().path("accessToken");
         return handleLogin;
     }
