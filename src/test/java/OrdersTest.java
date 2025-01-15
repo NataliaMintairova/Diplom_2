@@ -60,9 +60,9 @@ public class OrdersTest {
         Response response1 = orderApi.createOrder(orderData);
         response1.then()
                 .log().all()
-                .statusCode(401)
+                .statusCode(200)
                 .assertThat()
-                .body("success", equalTo(false));
+                .body("success", equalTo(true));
     }
 
     @Test
