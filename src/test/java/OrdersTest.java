@@ -15,7 +15,7 @@ import static io.restassured.RestAssured.given;
 import static org.hamcrest.core.IsEqual.equalTo;
 
 
-public class OrdersTest {
+public class OrdersTest extends BaseTest{
     UserApi userApi;
     UserData user;
     String random = RandomStringUtils.randomAlphabetic(5);
@@ -24,7 +24,6 @@ public class OrdersTest {
 
     @Before
     public void setUp() {
-        RestAssured.baseURI = "https://stellarburgers.nomoreparties.site";
         userApi = new UserApi();
         user = new UserData(random + "@yandex.ru", random, random);
         Response response = userApi.createUser(user);
@@ -46,7 +45,7 @@ public class OrdersTest {
         Response response1 = orderApi.createOrder(orderData);
         response1.then()
                 .log().all()
-                .statusCode(200)
+                .statusCode(HTTP_OK)
                 .assertThat()
                 .body("success", equalTo(true));
     }
@@ -60,7 +59,8 @@ public class OrdersTest {
         Response response1 = orderApi.createOrder(orderData);
         response1.then()
                 .log().all()
-                .statusCode(200)
+                //Код 200 по согласованию с наставником в Пачке
+                .statusCode(HTTP_OK)
                 .assertThat()
                 .body("success", equalTo(true));
     }
@@ -76,7 +76,7 @@ public class OrdersTest {
         Response response1 = orderApi.createOrder(orderData);
         response1.then()
                 .log().all()
-                .statusCode(400)
+                .statusCode(HTTP_BAD_REQUEST)
                 .assertThat()
                 .body("success", equalTo(false));
     }
@@ -92,7 +92,7 @@ public class OrdersTest {
         Response response1 = orderApi.createOrder(orderData);
         response1.then()
                 .log().all()
-                .statusCode(500);
+                .statusCode(HTTP_INTERNAL_SERVER_ERROR);
     }
 
     @Test
@@ -104,7 +104,7 @@ public class OrdersTest {
         Response response = orderApi.getOrdersList();
         response.then()
                 .log().all()
-                .statusCode(200)
+                .statusCode(HTTP_OK)
                 .assertThat()
                 .body("success", equalTo(true));
     }
@@ -116,7 +116,9 @@ public class OrdersTest {
         Response response = orderApi.getOrdersList();
         response.then()
                 .log().all()
-                .statusCode(401)
+                //Должен падать
+                //В документации: Если выполнить запрос без авторизации, вернётся код ответа 401
+                .statusCode(HTTP_UNAUTHORIZED)
                 .assertThat()
                 .body("success", equalTo(false));
     }

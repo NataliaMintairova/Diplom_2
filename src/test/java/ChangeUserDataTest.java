@@ -9,7 +9,7 @@ import org.junit.Test;
 
 import static org.hamcrest.core.IsEqual.equalTo;
 
-public class ChangeUserDataTest {
+public class ChangeUserDataTest extends BaseTest{
     UserApi userApi;
     UserData user;
     UserData user1;
@@ -17,7 +17,7 @@ public class ChangeUserDataTest {
 
     @Before
     public void setUp(){
-        RestAssured.baseURI = "https://stellarburgers.nomoreparties.site";
+        //RestAssured.baseURI = "https://stellarburgers.nomoreparties.site";
         userApi = new UserApi();
         user = new UserData(random + "@yandex.ru", random, random);
         Response response = userApi.createUser(user);
@@ -35,7 +35,7 @@ public class ChangeUserDataTest {
         Response response = userApi.changeEmailUser(user1);
         response.then()
                 .log().all()
-                .statusCode(200)
+                .statusCode(HTTP_OK)
                 .assertThat()
                 .body("success", equalTo(true));
     }
@@ -47,7 +47,9 @@ public class ChangeUserDataTest {
         Response response = userApi.changeEmailUser(user1);
         response.then()
                 .log().all()
-                .statusCode(403)
+                //Должен падать
+                //В документации: Если передать почту, которая уже используется, вернётся код ответа 403
+                .statusCode(HTTP_FORBIDDEN)
                 .assertThat()
                 .body("success", equalTo(false));
     }
@@ -58,7 +60,9 @@ public class ChangeUserDataTest {
         Response response = userApi.changeEmailUser(user1);
         response.then()
                 .log().all()
-                .statusCode(401)
+                //Должен падать
+                //В документации: Если выполнить запрос без авторизации, вернётся код ответа 401
+                .statusCode(HTTP_UNAUTHORIZED)
                 .assertThat()
                 .body("success", equalTo(false));
     }
