@@ -1,3 +1,6 @@
+import io.qameta.allure.Description;
+import io.qameta.allure.Step;
+import io.qameta.allure.junit4.DisplayName;
 import io.restassured.RestAssured;
 import io.restassured.response.Response;
 import org.apache.commons.lang3.RandomStringUtils;
@@ -23,6 +26,7 @@ public class OrdersTest extends BaseTest{
     public static final String ING_2 = "61c0c5a71d1f82001bdaaa6f";
 
     @Before
+    @Step("set Up")
     public void setUp() {
         userApi = new UserApi();
         user = new UserData(random + "@yandex.ru", random, random);
@@ -30,11 +34,14 @@ public class OrdersTest extends BaseTest{
     }
 
     @After
+    @Step("clean Up")
     public void cleanUp(){
         userApi.deleteUser();
     }
 
     @Test
+    @DisplayName("create Order Correct Ingredients Authorized User")
+    @Description("проверка создания заказа с корректными ингредиентами авторизированным пользователем")
     public void createOrderCorrectIngridsAutorizedUser() {
         OrderApi orderApi = new OrderApi();
         user = new UserData(user.getEmail(), user.getPassword());
@@ -51,6 +58,8 @@ public class OrdersTest extends BaseTest{
     }
 
     @Test
+    @DisplayName("create Order Correct Ingredients Unauthorized User")
+    @Description("проверка создания заказа с корректными ингредиентами неавторизированным пользователем")
     public void createOrderCorrectIngridsUnautorizedUser() {
         OrderApi orderApi = new OrderApi();
         orderApi.accessToken = userApi.accessToken;
@@ -66,6 +75,8 @@ public class OrdersTest extends BaseTest{
     }
 
     @Test
+    @DisplayName("create Order Without Ingredients Authorized User")
+    @Description("проверка создания заказа без ингредиентов авторизированным пользователем")
     public void createOrderWithoutIngridsAutorizedUser() {
         OrderApi orderApi = new OrderApi();
         user = new UserData(user.getEmail(), user.getPassword());
@@ -78,10 +89,13 @@ public class OrdersTest extends BaseTest{
                 .log().all()
                 .statusCode(HTTP_BAD_REQUEST)
                 .assertThat()
-                .body("success", equalTo(false));
+                .body("success", equalTo(false))
+                .body("message", equalTo("Ingredient ids must be provided"));
     }
 
     @Test
+    @DisplayName("create Order Incorrect Ingredients Authorized User")
+    @Description("проверка создания заказа с некорректными ингредиентами авторизированным пользователем")
     public void createOrderIncorrectIngridsAutorizedUser() {
         OrderApi orderApi = new OrderApi();
         user = new UserData(user.getEmail(), user.getPassword());
@@ -93,33 +107,5 @@ public class OrdersTest extends BaseTest{
         response1.then()
                 .log().all()
                 .statusCode(HTTP_INTERNAL_SERVER_ERROR);
-    }
-
-    @Test
-    public void getOrdersListAuthorizedUserTest(){
-        OrderApi orderApi = new OrderApi();
-        user = new UserData(user.getEmail(), user.getPassword());
-        userApi.loginUser(user);
-        orderApi.accessToken = userApi.accessToken;
-        Response response = orderApi.getOrdersList();
-        response.then()
-                .log().all()
-                .statusCode(HTTP_OK)
-                .assertThat()
-                .body("success", equalTo(true));
-    }
-
-    @Test
-    public void getOrdersListUnauthorizedUserTest(){
-        OrderApi orderApi = new OrderApi();
-        orderApi.accessToken = userApi.accessToken;
-        Response response = orderApi.getOrdersList();
-        response.then()
-                .log().all()
-                //Должен падать
-                //В документации: Если выполнить запрос без авторизации, вернётся код ответа 401
-                .statusCode(HTTP_UNAUTHORIZED)
-                .assertThat()
-                .body("success", equalTo(false));
     }
 }

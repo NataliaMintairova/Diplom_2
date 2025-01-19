@@ -67,5 +67,15 @@ public class UserApi {
                 .patch(USER_URI);
     }
 
+    @Step("change Email Unauthorized User")
+    public Response changeEmailUnauthorizedUser(UserData user1){
+        return
+                given()
+                        .header("Content-type", "application/json")
+                        .body(user1)
+                        .when()
+                        .patch(USER_URI);
+    }
+
 
 }

@@ -27,4 +27,10 @@ public class OrderApi {
                         .header("Authorization", accessToken)
                         .get(CREATE_ORDER_URI);
     }
+
+    @Step("get Orders List Unauthorized User")
+    public  Response getOrdersListUnauthorized(){
+        return
+                given().get(CREATE_ORDER_URI);
+    }
 }
